@@ -1,9 +1,16 @@
 #ifndef KALMAN_FILTER_H_
 #define KALMAN_FILTER_H_
-
 #include "Eigen/Dense"
 
 class KalmanFilter {
+
+ private:
+   /**
+  *   Global calculation for Kalman Filter and Extended Kalman Filter.
+  *   @param y.
+  */
+  void CalculateGlobal(const Eigen::VectorXd &y);
+
  public:
   /**
    * Constructor

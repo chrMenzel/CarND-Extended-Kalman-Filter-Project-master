@@ -32,23 +32,67 @@ void KalmanFilter::Predict() {
 
 void KalmanFilter::Update(const VectorXd &z) {
   /**
-   * TODO: update the state by using Kalman Filter equations
+   * lidar data (from laser) - uses basic Kalman filter equations
+   * 
+   * z is the measurement vector. For a lidar sensor, the 
+   * z vector contains the position − x and position - y measurements.
+   * 
+   * H_ is the matrix that projects our belief about the object's current
+   * state into the measurement space of the sensor.
+   * 
+   * R_ is a covariance matrix, which represents the uncertainty in our 
+   * sensor measurements. The dimensions of the R matrix is square and each
+   * side of its matrix is the same length as the number of measurements parameters.
    */
   VectorXd y = z - H_ * x_;
-  MatrixXd H_transposed = H_.transpose();
-  MatrixXd S = H_ * P_ * H_transposed + R_;
-  MatrixXd K = P_ * H_transposed * S.inverse();
+  CalculateGlobal(y);
 
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
-
-  // new state
-  x_ = x_ + K * y;
-  P_ = (I - K * H_) * P_;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
-   * TODO: update the state by using Extended Kalman Filter equations
+   * radar data - uses non-linear equations,
+   * so the update step involves linearizing the equations with the Jacobian matrix. 
    */
+
+  // range
+  float rho = std::sqrt(x_(0) * x_(0) + x_(1) * x_(1));
+  float phi = 0.0;                                        // bearing
+  float rho_dot = 0.0;                                    // range rate
+
+  // Calculate phi = bearing
+  // We have to avoid division by zero
+  if (std::fabs(x_(0)) > 0.0001)
+    phi = std::atan2(x_(1), x_(0));
+
+  // Calculate rho_dot = range rate
+  // We have to avoid division by zero
+  if (std::fabs(rho) > 0.0001)
+    rho_dot = (x_(0) * x_(2) + x_(1) * x_(3)) / rho;
+
+  VectorXd y(3);
+  y << rho, phi, rho_dot;
+
+  CalculateGlobal(y);
+}
+
+void KalmanFilter::CalculateGlobal(const VectorXd &y) {
+  /**
+   * The Code in Update and UpdateEKF are identical.
+   * So I have refactored the code by extracting this method.
+   * 
+   * It calculates the update for both, the Kalman Filter
+   * and the Extended Calman Filter
+   */
+
+  MatrixXd H_transposed = H_.transpose();
+  MatrixXd PHt = P_ * H_transposed;
+  MatrixXd S = H_ * PHt + R_;
+  MatrixXd K = PHt * S.inverse();
+
+  // new estimate
+  x_ = x_ + K * y;
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
 }
