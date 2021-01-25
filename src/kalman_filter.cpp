@@ -57,8 +57,8 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   // range
   float rho = std::sqrt(x_(0) * x_(0) + x_(1) * x_(1));
-  float phi = 0.0;                                        // bearing
-  float rho_dot = 0.0;                                    // range rate
+  float phi = 0.0;       // bearing
+  float rho_dot = 0.0;   // range rate
 
   // Calculate phi = bearing
   // We have to avoid division by zero
