@@ -160,16 +160,18 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   double noise_ax = 9.0;
   double noise_ay = 9.0;
 
-  // for better readability when setting the values of the Q matrix
+  // for better readability and less computation when setting the values of the Q matrix
   double dt_2 = dt * dt;
   double dt_3 = dt_2 * dt;
   double dt_4 = dt_3 * dt;
+  double dt_4div4 = dt_4 / 4;
+  double dt_3div2 = dt_3 / 2;
   
   // Update the process covariance matrix Q
-  ekf_.Q_ <<  dt_4 / 4 * noise_ax, 0.0, dt_3 / 2 * noise_ax, 0.0,
-              0.0, dt_4 / 4 * noise_ay, 0, dt_3 / 2 * noise_ay,
-              dt_3 / 2 * noise_ax, 0.0, dt_2 * noise_ax, 0.0,
-              0.0, dt_3 / 2 * noise_ay, 0.0, dt_2 * noise_ay;
+  ekf_.Q_ <<  dt_4div4 * noise_ax, 0.0, dt_3div2 * noise_ax, 0.0,
+              0.0, dt_4div4 * noise_ay, 0, dt_3div2 * noise_ay,
+              dt_3div2 * noise_ax, 0.0, dt_2 * noise_ax, 0.0,
+              0.0, dt_3div2 * noise_ay, 0.0, dt_2 * noise_ay;
 
   ekf_.Predict();
 
