@@ -56,8 +56,8 @@ FusionEKF::FusionEKF() {
              0, 0, 0, 1;
 
   // Initialize Q (noise covariance matrix)
-  ekf_.F_ = MatrixXd(4, 4);
-  ekf_.F_ << 1, 0, 0, 0,
+  ekf_.Q_ = MatrixXd(4, 4);
+  ekf_.Q_ << 1, 0, 0, 0,
              0, 1, 0, 0,
              0, 0, 1, 0,
              0, 0, 0, 1;
