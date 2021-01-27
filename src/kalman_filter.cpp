@@ -1,4 +1,5 @@
 #include "kalman_filter.h"
+#include <iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -56,23 +57,25 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    */
 
   // range
-  float rho = std::sqrt(x_(0) * x_(0) + x_(1) * x_(1));
-  float phi = 0.0;       // bearing
-  float rho_dot = 0.0;   // range rate
+  double rho = std::sqrt(x_(0) * x_(0) + x_(1) * x_(1));
+  double phi = 0.0;       // bearing
+  double rho_dot = 0.0;   // range rate
 
   // Calculate phi = bearing
   // We have to avoid division by zero
   if (std::fabs(x_(0)) > 0.0001)
     phi = std::atan2(x_(1), x_(0));
+  else
+    phi = 0.0001;
 
   // Calculate rho_dot = range rate
   // We have to avoid division by zero
-  if (std::fabs(rho) > 0.0001)
-    rho_dot = (x_(0) * x_(2) + x_(1) * x_(3)) / rho;
+  rho_dot = (x_(0) * x_(2) + x_(1) * x_(3)) / std::max(rho, 0.0001);
 
-  VectorXd y(3);
-  y << rho, phi, rho_dot;
+  VectorXd h(3);
+  h << rho, phi, rho_dot;
 
+  VectorXd y = z - h;
   CalculateGlobal(y);
 }
 
