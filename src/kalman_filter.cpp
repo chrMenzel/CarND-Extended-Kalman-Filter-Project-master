@@ -92,7 +92,7 @@ void KalmanFilter::CalculateGlobal(const VectorXd &y) {
    * So I have refactored the code by extracting this method.
    * 
    * It calculates the update for both, the Kalman Filter
-   * and the Extended Calman Filter
+   * and the Extended Kalman Filter
    */
 
   MatrixXd H_transposed = H_.transpose();
